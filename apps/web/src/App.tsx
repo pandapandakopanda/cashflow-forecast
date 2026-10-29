@@ -11,19 +11,8 @@ export default  function App() {
     })
   }, [])
 
-  const onClick = useCallback(() => {
-    const input = document.getElementById('input')
-    if(!(input instanceof HTMLInputElement)) return
-    const value = input.value
-
-    
-
-  }, [])
-  
-
-
   return  <div className="flex w-full h-dvh">
-    <div className="">
+    <div className="text-h1 font-medium w-full h-full bg-page-bg text-text-main">
       App main
     </div>
   </div>
