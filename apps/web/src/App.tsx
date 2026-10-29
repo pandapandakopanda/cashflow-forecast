@@ -1,8 +1,29 @@
+import { useEffect, useCallback } from "react"
 
-export default function App() {
+export default  function App() {
 
-  return  <div className="flex w-full h-dvh justify-center items-center">
-    <div className=" select-none font-bold bg-cyan-400 hover:bg-emerald-200 rounded-4xl size-50 text-amber-900 flex shadow-lg items-center justify-center cursor-pointer">
+
+  useEffect(   () => {
+    fetch('api/health').then((resp) => {
+      if(!resp.ok){
+        throw new Error('Сервер упал')
+      }
+    })
+  }, [])
+
+  const onClick = useCallback(() => {
+    const input = document.getElementById('input')
+    if(!(input instanceof HTMLInputElement)) return
+    const value = input.value
+
+    
+
+  }, [])
+  
+
+
+  return  <div className="flex w-full h-dvh">
+    <div className="">
       App main
     </div>
   </div>
