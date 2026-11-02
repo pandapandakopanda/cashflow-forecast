@@ -1,7 +1,11 @@
 import express from 'express';
 import errorHandler from './middleware/errorHandler';
+import { db } from './db';
+import { initializeSchema } from './database/schema';
 
 import type { Request, Response } from 'express';
+
+initializeSchema(db);
 
 const app = express();
 const port = Number(process.env.PORT ?? 3001);
