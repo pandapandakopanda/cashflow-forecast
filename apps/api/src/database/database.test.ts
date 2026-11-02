@@ -56,14 +56,14 @@ describe('SQLite initialization', () => {
       .prepare(
         'INSERT INTO transactions (id, title, type, amountCents, date) VALUES (?, ?, ?, ?, ?)',
       )
-      .run('test', 'Тест', 'income', 100, '2026-11-02')
+      .run('test', 'Тест', 'income', 12345, '2026-11-02')
     initializeSchema(first)
     first.close()
 
     const second = connect(filename)
     initializeSchema(second)
     expect(second.prepare('SELECT * FROM transactions').all()).toEqual([
-      { id: 'test', title: 'Тест', type: 'income', amountCents: 100, date: '2026-11-02' },
+      { id: 'test', title: 'Тест', type: 'income', amountCents: 12345, date: '2026-11-02' },
     ])
   })
 
