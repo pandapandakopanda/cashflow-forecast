@@ -5,3 +5,7 @@ package-lock.json
 SPEC.md
 .tools/
 .npm-cache/
+
+# Preserve manually chosen JSX line breaks; VS Code uses its built-in formatter.
+**/*.tsx
+**/*.jsx

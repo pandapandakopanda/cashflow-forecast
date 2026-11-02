@@ -7,9 +7,9 @@ export enum Errors {
   INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 
-export type ErrorsKeyType = keyof typeof Errors;
+export type ErrorsKeyType = keyof typeof Errors
 
-import type { ErrorDefinitionType } from './_types';
+import type { ErrorDefinitionType } from './_types'
 
 export const ErrorsMap: Record<ErrorsKeyType, ErrorDefinitionType> = {
   [Errors.INVALID_MONTH]: { status: 400, message: 'Неверный сегмент месяца в URL' },
@@ -24,4 +24,4 @@ export const ErrorsMap: Record<ErrorsKeyType, ErrorDefinitionType> = {
     message: 'Финансовый план изменился. Обновите данные и создайте эксперимент заново.',
   },
   [Errors.INTERNAL_ERROR]: { status: 500, message: 'Непредвиденная ошибка' },
-};
+}

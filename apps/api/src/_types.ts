@@ -3,14 +3,14 @@ export enum TransactionEnum {
   EXPENSE = 'expense',
 }
 
-export type TransactionTypeType = TransactionEnum;
+export type TransactionTypeType = TransactionEnum
 
 export type Transaction = {
-  id: string;
-  title: string;
-  type: TransactionTypeType;
-  amountCents: number;
-  date: string;
-};
+  id: string
+  title: string
+  type: TransactionTypeType
+  amountCents: number
+  date: string
+}
 
-export type NewTransaction = Omit<Transaction, 'id'>;
+export type NewTransaction = Omit<Transaction, 'id'>

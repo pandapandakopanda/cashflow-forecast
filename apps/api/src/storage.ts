@@ -1,14 +1,15 @@
-import {randomUUID} from 'node:crypto'
-import {db} from './db'
-
+import { randomUUID } from 'node:crypto'
+import { db } from './db'
+import { createMonthBalancesRepository } from './database/monthBalances'
 
 import type { NewTransaction, Transaction } from './_types'
 
+export const { getOpeningBalance, upsertOpeningBalance } = createMonthBalancesRepository(db)
 
-export function createTransaction(data:NewTransaction):Transaction{
+export function createTransaction(data: NewTransaction): Transaction {
   const transaction = {
     ...data,
-    id:randomUUID()
+    id: randomUUID(),
   }
 
   const statment = db.prepare(`

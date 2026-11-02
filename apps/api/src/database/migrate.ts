@@ -1,9 +1,9 @@
-import { db } from '../db';
-import { initializeSchema } from './schema';
+import { db } from '../db'
+import { initializeSchema } from './schema'
 
 try {
-  initializeSchema(db);
-  console.log(`Схема БД готова: ${db.name}`);
+  initializeSchema(db)
+  console.log(`Схема БД готова: ${db.name}`)
 } finally {
-  db.close();
+  db.close()
 }

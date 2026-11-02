@@ -1,4 +1,5 @@
-import type Database from 'better-sqlite3';
+import type Database from 'better-sqlite3'
+import { createMonthBalancesTable } from './migrations/001-month-balances'
 
 export function initializeSchema(db: Database.Database): void {
   db.transaction(() => {
@@ -11,6 +12,7 @@ export function initializeSchema(db: Database.Database): void {
           CHECK (amountCents BETWEEN 1 AND 99999999999),
         date TEXT NOT NULL
       )
-    `);
-  })();
+    `)
+    createMonthBalancesTable(db)
+  })()
 }

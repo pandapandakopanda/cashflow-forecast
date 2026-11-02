@@ -1,44 +1,44 @@
-import type { ErrorRequestHandler } from 'express';
-import { Errors, ErrorsMap } from './errors';
-import type { ErrorsKeyType } from './errors';
-import type { DetailType, ErrorBodyType } from './_types';
+import type { ErrorRequestHandler } from 'express'
+import { Errors, ErrorsMap } from './errors'
+import type { ErrorsKeyType } from './errors'
+import type { DetailType, ErrorBodyType } from './_types'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
+  return typeof value === 'object' && value !== null
 }
 
 function isErrorCode(value: unknown): value is ErrorsKeyType {
-  return typeof value === 'string' && Object.hasOwn(ErrorsMap, value);
+  return typeof value === 'string' && Object.hasOwn(ErrorsMap, value)
 }
 
 function isDetail(value: unknown): value is DetailType {
-  return isRecord(value) && typeof value.field === 'string' && typeof value.message === 'string';
+  return isRecord(value) && typeof value.field === 'string' && typeof value.message === 'string'
 }
 
 // Известные ошибки передаются как { code: Errors.VALIDATION_ERROR, details: [...] }.
 const errorHandler: ErrorRequestHandler = (err: unknown, _req, res, next): void => {
   if (res.headersSent) {
-    next(err);
-    return;
+    next(err)
+    return
   }
 
-  let code: ErrorsKeyType = Errors.INTERNAL_ERROR;
-  let details: DetailType[] = [];
+  let code: ErrorsKeyType = Errors.INTERNAL_ERROR
+  let details: DetailType[] = []
 
   if (isRecord(err)) {
     if (err.type === 'entity.parse.failed' && err.status === 400) {
-      code = Errors.INVALID_JSON;
+      code = Errors.INVALID_JSON
     } else if (isErrorCode(err.code)) {
-      code = err.code;
+      code = err.code
       if (code !== Errors.INTERNAL_ERROR && Array.isArray(err.details)) {
-        details = err.details.filter(isDetail).map(({ field, message }) => ({ field, message }));
+        details = err.details.filter(isDetail).map(({ field, message }) => ({ field, message }))
       }
     }
   }
 
-  const definition = ErrorsMap[code];
-  const error: ErrorBodyType = { message: definition.message, details, code };
-  res.status(definition.status).json({ error });
-};
+  const definition = ErrorsMap[code]
+  const error: ErrorBodyType = { message: definition.message, details, code }
+  res.status(definition.status).json({ error })
+}
 
-export default errorHandler;
+export default errorHandler
