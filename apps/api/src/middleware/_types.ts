@@ -1,10 +1,13 @@
+import type { ErrorsKeyType } from './errors'
+
+
 export type DetailType = {
   field: string
   message: string
 }
 
 export type ErrorBodyType = {
-  code: import('./errors').ErrorsKeyType
+  code: ErrorsKeyType
   message: string
   details: Array<DetailType>
 }

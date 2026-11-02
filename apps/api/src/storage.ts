@@ -2,7 +2,12 @@ import { randomUUID } from 'node:crypto'
 import { db } from './db'
 import { createMonthBalancesRepository } from './database/monthBalances'
 
-import type { NewTransaction, Transaction } from './_types'
+import type {
+  NewTransaction,
+  Transaction,
+  RecurringRule,
+  RecurringExceptionRow,
+} from './_types'
 
 export const { getOpeningBalance, upsertOpeningBalance } = createMonthBalancesRepository(db)
 
@@ -20,4 +25,9 @@ export function createTransaction(data: NewTransaction): Transaction {
   statment.run(transaction)
 
   return transaction
+}
+
+
+export function getTransactionByMonth(month: string, daysInMonth: number) {
+
 }

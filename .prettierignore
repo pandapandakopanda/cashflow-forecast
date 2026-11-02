@@ -6,6 +6,7 @@ SPEC.md
 .tools/
 .npm-cache/
 
-# Preserve manually chosen JSX line breaks; VS Code uses its built-in formatter.
+# TypeScript uses the built-in formatter to preserve type commas and JSX line breaks.
+**/*.ts
 **/*.tsx
 **/*.jsx
