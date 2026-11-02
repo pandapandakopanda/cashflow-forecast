@@ -1,7 +1,7 @@
 import type { ErrorRequestHandler } from 'express';
-import { ErrorsMap } from './errors';
-import type { ErrorsKeyType } from './errors';
-import type { DetailType, ErrorBodyType } from './_types';
+import { ErrorsMap } from './errors.js';
+import type { ErrorsKeyType } from './errors.js';
+import type { DetailType, ErrorBodyType } from './_types.js';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -37,7 +37,7 @@ const errorHandler: ErrorRequestHandler = (err: unknown, _req, res, next): void 
   }
 
   const definition = ErrorsMap[code];
-  const error: ErrorBodyType = { code, message: definition.message, details };
+  const error: ErrorBodyType = { message: definition.message, details, code };
   res.status(definition.status).json({ error });
 };
 
