@@ -1,7 +1,7 @@
 import type { ErrorRequestHandler } from 'express';
-import { ErrorsMap } from './errors.js';
-import type { ErrorsKeyType } from './errors.js';
-import type { DetailType, ErrorBodyType } from './_types.js';
+import { Errors, ErrorsMap } from './errors';
+import type { ErrorsKeyType } from './errors';
+import type { DetailType, ErrorBodyType } from './_types';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -22,15 +22,15 @@ const errorHandler: ErrorRequestHandler = (err: unknown, _req, res, next): void 
     return;
   }
 
-  let code: ErrorsKeyType = 'INTERNAL_ERROR';
+  let code: ErrorsKeyType = Errors.INTERNAL_ERROR;
   let details: DetailType[] = [];
 
   if (isRecord(err)) {
     if (err.type === 'entity.parse.failed' && err.status === 400) {
-      code = 'INVALID_JSON';
+      code = Errors.INVALID_JSON;
     } else if (isErrorCode(err.code)) {
       code = err.code;
-      if (code !== 'INTERNAL_ERROR' && Array.isArray(err.details)) {
+      if (code !== Errors.INTERNAL_ERROR && Array.isArray(err.details)) {
         details = err.details.filter(isDetail).map(({ field, message }) => ({ field, message }));
       }
     }
