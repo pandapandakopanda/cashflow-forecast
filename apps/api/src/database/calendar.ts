@@ -1,6 +1,3 @@
-
-
-
 export function getDaysInMonth(month: string): number {
 
   const year = Number(month.slice(0, 4))

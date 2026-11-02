@@ -4,6 +4,8 @@ import { Errors } from '../middleware/errors'
 import { monthSchema } from './schemas'
 
 export * from './schemas'
+export * from './recurring'
+export * from './scenario'
 
 export class ValidationError extends Error {
   constructor(

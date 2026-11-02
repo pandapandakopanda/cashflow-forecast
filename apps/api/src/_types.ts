@@ -34,3 +34,30 @@ export type RecurringExceptionRow = {
   amountCents: number | null,
   date: string | null,
 }
+
+export type Recurrence = {
+  ruleId: string,
+  dayOfMonth: number,
+  startMonth: string,
+  overridden: boolean,
+}
+
+export type RecurringException = {
+  ruleId: string,
+  month: string,
+} & (
+    | { action: 'skip' }
+    | ({ action: 'override' } & NewTransaction)
+  )
+
+export type MonthOperation = Transaction & (
+  | { source: 'oneTime' }
+  | { source: 'recurring', recurrence: Recurrence }
+)
+
+export type MonthPlan = {
+  month: string,
+  revision: number,
+  openingBalanceCents: number | null,
+  operations: MonthOperation[],
+}

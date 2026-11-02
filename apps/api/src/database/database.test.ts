@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { openDatabase } from './connection'
 import { initializeSchema } from './schema'
 import { createMonthBalancesRepository } from './monthBalances'
+import { createStorage } from '../storage'
 
 describe('SQLite initialization', () => {
   let directory: string
@@ -113,6 +114,76 @@ describe('SQLite initialization', () => {
       revision: 7,
     })
   })
+
+  it('preserves API mutations and their global revision after reopening', () => {
+    const filename = join(directory, 'api.sqlite')
+    const first = connect(filename)
+    initializeSchema(first)
+    const storage = createStorage(first)
+    const created = storage.createTransaction({
+      title: 'Аптека', type: 'expense', amountCents: 12345, date: '2026-11-12',
+    })
+    const deleted = storage.createTransaction({
+      title: 'Удалить', type: 'income', amountCents: 1, date: '2026-11-13',
+    })
+    storage.updateTransaction(created.transaction.id, { date: '2026-12-02' })
+    storage.deleteTransaction(deleted.transaction.id)
+    storage.setOpeningBalance('2026-11', { openingBalanceCents: 0 })
+    storage.setOpeningBalance('2026-12', { openingBalanceCents: -250000 })
+    first.close()
+
+    const second = connect(filename)
+    initializeSchema(second)
+    const reopened = createStorage(second)
+    expect(reopened.getMonthPlan('2026-11')).toEqual({
+      month: '2026-11', revision: 6, openingBalanceCents: 0, operations: [],
+    })
+    expect(reopened.getMonthPlan('2026-12')).toEqual({
+      month: '2026-12', revision: 6, openingBalanceCents: -250000,
+      operations: [{ ...created.transaction, date: '2026-12-02', source: 'oneTime' }],
+    })
+  }, 30_000) // Several durable SQLite commits can exceed 5 seconds on Windows.
+
+  it('preserves rule mutations, monthly exceptions and an applied scenario after reopening', () => {
+    const filename = join(directory, 'scenario.sqlite')
+    const first = connect(filename)
+    initializeSchema(first)
+    const storage = createStorage(first)
+    const created = storage.createRecurringRule({
+      title: 'Кредит', type: 'expense', amountCents: 150000, dayOfMonth: 10, startMonth: '2026-11',
+    })
+    const ruleId = created.rule.id
+    storage.updateRecurringRule(ruleId, { dayOfMonth: 31 })
+    storage.setRecurringException(ruleId, '2026-11', { action: 'skip' })
+    storage.deleteRecurringException(ruleId, '2026-11')
+    storage.setRecurringException(ruleId, '2026-12', { action: 'skip' })
+
+    const removed = storage.createRecurringRule({
+      title: 'Удалить', type: 'income', amountCents: 1, dayOfMonth: 1, startMonth: '2026-11',
+    })
+    storage.setRecurringException(removed.rule.id, '2026-11', { action: 'skip' })
+    storage.deleteRecurringRule(removed.rule.id)
+
+    const current = storage.getMonthPlan('2026-11')
+    const saved = storage.applyScenario('2026-11', {
+      revision: current.revision,
+      openingBalanceCents: 0,
+      operations: [
+        { source: 'recurring', id: `occ_${ruleId}_2026-11`, title: 'Разовая замена', type: 'expense', amountCents: 12345, date: '2026-11-20' },
+        { source: 'new', clientId: 'draft', title: 'Новая', type: 'income', amountCents: 100, date: '2026-11-02' },
+      ],
+    })
+    expect(saved.revision).toBe(current.revision + 1)
+    first.close()
+
+    const second = connect(filename)
+    initializeSchema(second)
+    const reopened = createStorage(second)
+    expect(reopened.getMonthPlan('2026-11')).toEqual(saved)
+    expect(reopened.getMonthPlan('2026-12').operations).toEqual([])
+    expect(reopened.getRecurringRules()).toEqual([{ ...created.rule, dayOfMonth: 31 }])
+    expect(second.prepare('SELECT * FROM recurring_exceptions WHERE ruleId = ?').all(removed.rule.id)).toEqual([])
+  }, 30_000)
 
   it('enforces foreign keys on every connection', () => {
     for (const filename of [join(directory, 'cashflow.sqlite'), ':memory:']) {
