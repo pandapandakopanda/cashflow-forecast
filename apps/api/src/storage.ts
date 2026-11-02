@@ -1,8 +1,8 @@
 import {randomUUID} from 'node:crypto'
-import {db} from './db.js'
+import {db} from './db'
 
 
-import type { NewTransaction, Transaction } from './_types.js'
+import type { NewTransaction, Transaction } from './_types'
 
 
 export function createTransaction(data:NewTransaction):Transaction{

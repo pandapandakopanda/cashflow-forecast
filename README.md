@@ -76,6 +76,10 @@ CI выполняет `npm ci` и `npm run check`.
 | `npm run build`                           | Исходники клиента и сервера               |
 | `npm run start --workspace @cashflow/api` | Собранный `apps/api/dist/index.js`        |
 
+В API локальные импорты можно писать без расширения: например, `./middleware/errorHandler`.
+TypeScript использует `moduleResolution: Bundler`, а команды разработки и запуска
+собранного API используют `tsx` для разрешения таких путей.
+
 После появления исходников нужно включить их проверку типов и сборку в CI;
 после добавления тестов — убрать `--passWithNoTests`. Vitest пока настроен для
 тестов в Node.js; окружение для UI и E2E будет добавлено вместе с такими тестами.
