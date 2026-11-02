@@ -1,4 +1,5 @@
 import js from '@eslint/js'
+import stylistic from '@stylistic/eslint-plugin'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import globals from 'globals'
@@ -11,6 +12,13 @@ export default tseslint.config(
   {
     files: ['**/*.{ts,tsx,mjs}'],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['apps/web/src/**/*.{tsx,jsx}'],
+    plugins: { '@stylistic': stylistic },
+    rules: {
+      '@stylistic/jsx-self-closing-comp': ['error', { component: true, html: true }],
+    },
   },
   {
     files: ['apps/web/src/**/*.{ts,tsx}'],
