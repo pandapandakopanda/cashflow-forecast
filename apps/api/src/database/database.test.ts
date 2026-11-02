@@ -84,6 +84,36 @@ describe('SQLite initialization', () => {
     expect(reopened.getOpeningBalance('2027-01')).toBeNull()
   })
 
+  it('preserves a recurring rule, its exception and profile revision after reopening', () => {
+    const filename = join(directory, 'recurring.sqlite')
+    const first = connect(filename)
+    initializeSchema(first)
+    first
+      .prepare(
+        `INSERT INTO recurring_rules (id, title, type, amountCents, dayOfMonth, startMonth)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .run('rule', 'Кредит', 'expense', 12345, 31, '2026-09')
+    first
+      .prepare(`INSERT INTO recurring_exceptions (ruleId, month, action) VALUES (?, ?, ?)`)
+      .run('rule', '2026-11', 'skip')
+    first.prepare('UPDATE profile_state SET revision = 7 WHERE id = 1').run()
+    first.close()
+
+    const second = connect(filename)
+    initializeSchema(second)
+    expect(second.prepare('SELECT id, amountCents FROM recurring_rules').get()).toEqual({
+      id: 'rule',
+      amountCents: 12345,
+    })
+    expect(second.prepare('SELECT month, action FROM recurring_exceptions').all()).toEqual([
+      { month: '2026-11', action: 'skip' },
+    ])
+    expect(second.prepare('SELECT revision FROM profile_state WHERE id = 1').get()).toEqual({
+      revision: 7,
+    })
+  })
+
   it('enforces foreign keys on every connection', () => {
     for (const filename of [join(directory, 'cashflow.sqlite'), ':memory:']) {
       const db = connect(filename)
